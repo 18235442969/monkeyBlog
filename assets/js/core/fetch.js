@@ -1,9 +1,10 @@
 import axios from 'axios';
+
 // import store from '../../../store';
 
 // 创建axios实例
 const service = axios.create({
-  baseURL: 'https://easy-mock.com/mock/5950a2419adc231f356a6636/vue-admin', // api的base_url
+  baseURL: 'http://localhost:8080', // api的base_url
   timeout: 5000                  // 请求超时时间
 });
 
@@ -12,7 +13,7 @@ service.interceptors.request.use(config => {
   // if (store.getters.token) {
   //   config.headers['X-Token'] = store.getters.token; // 让每个请求携带自定义token 请根据实际情况自行修改
   // }
-  console.log(config);
+  // console.log(config);
   return config;
 }, error => {
   // Do something with request error

@@ -3,21 +3,18 @@
         <my-header class="header"></my-header>
         <div class="container">
             <slider class="slider" :class="[$store.state.user.isSliderShow ? 'sliderShow' : '']"></slider>
-            <div class="shadow" @click="closeSlider(false)"></div>
+            <div class="shadow" @click="closeSlider(false)" :style="{display: $store.state.user.isSliderShow ? 'block' : 'none'}"></div>
             <nuxt class="content"></nuxt>
         </div>
-        <!-- <my-footer class="footer"></my-footer> -->
     </div>
 </template>
 
 <script>
-// import MyFooter from '../components/Footer.vue'
 import MyHeader from '../components/Header.vue'
 import Slider from '../components/Slider.vue'
 
 export default {
     components: {
-        // MyFooter
         MyHeader,
         Slider
     },
