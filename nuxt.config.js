@@ -1,6 +1,6 @@
 module.exports = {
     vender:[
-        'element-ui'
+        'element-ui', 'axios'
     ],
     /*
     ** Headers of the page
@@ -55,5 +55,8 @@ module.exports = {
             src: '~plugins/element-ui',
             ssr: true
         }
-    ]
+    ],
+    build: {
+        vendor: ['axios', 'element-ui']
+    }
 }

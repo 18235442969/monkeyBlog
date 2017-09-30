@@ -36,11 +36,18 @@ const app = {
          * [pathIndex 当前路由地址]
          * @type {String}
          */
-        pathIndex: ''
+        pathIndex: '',
+        /**
+         * [scrollY 滚动条的位置]
+         */
+        scrollY: 0
     },
     mutations: {
         CHANGEPATHINDEX: (state, par) => {
             state.pathIndex = par.pathIndex;
+        },
+        SETSCROLLY: (state, par) => {
+            state.scrollY = par;
         }
     },
     actions: {

@@ -73,7 +73,7 @@ module.exports =
 /***/ function(module, exports) {
 
 module.exports = {
-    vender: ['element-ui'],
+    vender: ['element-ui', 'axios'],
     /*
     ** Headers of the page
     */
@@ -113,7 +113,10 @@ module.exports = {
     plugins: [{
         src: '~plugins/element-ui',
         ssr: true
-    }]
+    }],
+    build: {
+        vendor: ['axios', 'element-ui']
+    }
 };
 
 /***/ },
