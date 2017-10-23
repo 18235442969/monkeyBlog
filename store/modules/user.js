@@ -22,7 +22,7 @@ const user = {
          */
         saveUserInfo({commit}, par) {
             return new Promise( resolve => {
-                commit('SAVELOGININFO', par);
+                // commit('SAVELOGININFO', par);
                 resolve();
             });
         },

@@ -1,16 +1,16 @@
 module.exports = {
     vender:[
-        'element-ui', 'axios'
+        'element-ui', 'axios', 'mavon-editor'
     ],
     /*
     ** Headers of the page
     */
     head: {
-        title: 'starter',
+        title: "HZY'Blog",
         meta: [
           { charset: 'utf-8' },
           { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-          { hid: 'description', name: 'description', content: 'Nuxt.js project' }
+          { hid: 'description', name: 'description', content: "HZY'Blog" }
         ],
         link: [
           { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
@@ -28,11 +28,15 @@ module.exports = {
     },{
         src: '~static/css/font-awesome.min.css',
         lang: 'css'
+    },{
+        src: 'mavon-editor/dist/css/index.css',
+        lang: 'css'
     }],
     /*
     ** Customize the progress-bar color
     */
-    loading: { color: '#3B8070' },
+    // loading: { color: '#3B8070' },
+    loading: { color: '#59afec' },
     loaders: [
         {
             test: '/\.scss$/',
@@ -54,6 +58,9 @@ module.exports = {
         {
             src: '~plugins/element-ui',
             ssr: true
+        },{
+            src: '~plugins/mavon-editor',
+            ssr: false
         }
     ],
     build: {
