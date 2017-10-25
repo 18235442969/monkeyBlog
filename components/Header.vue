@@ -5,7 +5,7 @@
   		</div>
 		<h1 class="blog" @click="goToHme">HZY'Blog</h1>
 		<div class="loginBtn">
-			<el-button type="text" v-if="!loginInfo" @click="loginIn">登录</el-button>
+			<el-button type="text" v-if="!loginInfo" @click="loginInDialog = true">登录</el-button>
 			<el-dropdown @command="handleCommand" trigger="click" v-else>
 			  	<span class="el-dropdown-link">
 			    	{{loginInfo.name}}
@@ -17,10 +17,24 @@
 			  	</el-dropdown-menu>
 			</el-dropdown>
   		</div>
+  		<el-dialog title="登录" :visible.sync="loginInDialog" :modal="false" size="tiny">
+		  	<el-form :model="loginData" :rules="loginRule" ref="loginData" label-width="50px" class="demo-ruleForm">
+		  		<el-form-item label="账号" prop="username">
+			    	<el-input type="text" v-model="loginData.username" auto-complete="off"></el-input>
+			  	</el-form-item>
+			  	<el-form-item label="密码" prop="password">
+			    	<el-input type="password" v-model="loginData.password" auto-complete="off"></el-input>
+			  	</el-form-item>
+			  	<el-form-item style="text-align: right;">
+			    	<el-button type="primary" @click="submitForm('loginData')">提交</el-button>
+			  	</el-form-item>
+			</el-form>
+		</el-dialog>
   	</header>
 </template>
 <script>
 	import { mapGetters } from 'vuex'
+	import api from '../assets/js/api/loginApi.js'
 	export default {
 		computed: {
 	        ...mapGetters([
@@ -28,8 +42,47 @@
 	        ])
 	    },
 	    data() {
+	    	const validateUsername = (rule, value, callback) => {
+	    		if ( value.trim() == '' ) {
+		          	return callback(new Error('请输入账号'));
+		        }
+		        setTimeout(() => {
+		          	const usernameReg = /[a-zA-Z0-9]{5,12}/;
+		          	if (usernameReg.test(value)) {
+		          		callback();
+		          	} else {
+		          		callback("账号为5-12位");
+		          	}
+		        }, 100);
+	    	}
+	    	const validatePassword = (rule, value, callback) => {
+	    		if ( value.trim() == '' ) {
+		          	return callback(new Error('请输入密码'));
+		        }
+		        setTimeout(() => {
+		          	const passwordReg = /[a-z0-9A-Z]{6,12}/;
+		          	if (passwordReg.test(value)) {
+		          		callback();
+		          	} else {
+		          		callback("密码为6-12位");
+		          	}
+		        }, 100);
+	    	}
 	    	return {
-	    		loginInfo: false
+	    		loginInfo: false,
+	    		loginInDialog: false,
+	    		loginData: {
+	    			username: '',
+	    			password: ''
+	    		},
+	    		loginRule: {
+		          	username: [
+		            	{ validator: validateUsername,trigger: 'blur' }
+		          	],
+		          	password: [
+		            	{ validator: validatePassword,trigger: 'blur'}
+		          	]
+		        }
 	    	}
 	    },
 		asyncData () {
@@ -48,16 +101,41 @@
 					this.$router.push('/managementCenter');
 				}
 			},
-			loginIn() {
-				localStorage.setItem('loginInfo', JSON.stringify({name: 'hzy'}));
-				this.loginInfo = {name: 'hzy'};
+			submitForm(formName) {
+				this.$refs[formName].validate((valid) => {
+		          	if (valid) {
+		          		this.loginIn();
+		          	} else {
+			            return false;
+		          	}
+		        });
+			},
+			loginIn (){
+				api.loginIn(this.loginData).then((data) => {
+					if (data.status === '01') {
+						this.loginInDialog = false;
+						this.loginData.username = '';
+						this.loginData.password = '';
+						let nowDate = new Date();
+					  	nowDate.setTime(nowDate.getTime() + (10 * 60 * 1000));
+					  	var expires = "expires = " + nowDate.toGMTString();
+					  	document.cookie = 'loginInfo=' + JSON.stringify(data.data) + "; " + expires;
+						this.loginInfo = data.data;
+					} else {
+						this.$message.error(data.msg);
+					}
+				})
 			},
 			goToHme() {
 				this.$router.push('/');
 			}
 		},
 		mounted() {
-			this.loginInfo = localStorage.loginInfo ? JSON.parse(localStorage.loginInfo) : false;
+			let cookieArr = document.cookie.split(';')
+			let loginInfo = cookieArr.find(e => e.indexOf('loginInfo=') > -1);
+			if (loginInfo) {
+				this.loginInfo = JSON.parse(loginInfo.split('=')[1]);
+			}
 		}
 	}
 </script>
@@ -73,5 +151,10 @@
 	}
 	.blog{
 		cursor: pointer;
+	}
+	@media (max-width: 800px) {
+		.loginBtn{
+			display: none;
+		}
 	}
 </style>

@@ -18,9 +18,12 @@
 			<mavon-editor v-model="value" :toolbars="toolbars" @imgAdd="imgAdd"></mavon-editor>
 		</no-ssr>
 		<div class="article-control">
-			<el-button type="success">保存</el-button>
+			<el-button type="success" @click="save">保存</el-button>
      		<el-button type="warning">发布</el-button>
     		<el-button type="danger">删除</el-button>
+		</div>
+		<div v-html="htmlShow" class="htmlShow">
+			
 		</div>
 	</div>
 </template>
@@ -38,6 +41,7 @@
       	smartLists: true,
       	smartypants: false
     });
+	import api from '../assets/js/api/article.js'
 	export default {
 		layout: 'managerment',
 		components: {
@@ -95,9 +99,16 @@
 		},
 		methods: {
 			imgAdd(name, imgfile) {
-				// console.log(imgfile);
-    			this.value = this.value.replace(name, "http://img2.imgtn.bdimg.com/it/u=3503262514,3822206168&fm=27&gp=0.jpg");
-    			this.htmlShow = marked(this.value);
+				let param = new FormData(); //创建form对象
+	          	param.append('file', imgfile);//通过append向form对象添加数据
+	          	let config = {
+		            headers:{'Content-Type':'multipart/form-data'}
+	          	};  //添加请求头
+	          	api.upload(param, config).then( response => {
+	          		if (response.status == '01') {
+		    			this.value = this.value.replace(name, response.imgName);
+	          		}
+	          	})
 			},
 			deleteTag(tag, index) {
 				this.articleDetail.tags.splice(index, 1);
@@ -110,6 +121,9 @@
 				} else {
 					this.$message.error('请输入标签内容再添加');
 				}
+			},
+			save (){
+    			this.htmlShow = marked(this.value).replace(/<img/g, '<img style="width: 100%;"');
 			}
 		},
 		computed: {
@@ -137,5 +151,11 @@
 	.article-control{
 		margin-right: 20px;
 		text-align: right;
+	}
+	.htmlShow{
+		width: 100%;
+		img{
+			width: 100%;
+		}
 	}
 </style>
