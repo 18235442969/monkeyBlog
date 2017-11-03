@@ -1,39 +1,16 @@
 <template>
   	<div>
   		<div>
-  			<h2 class="tag-title">标签</h2>
+            <div class="article-title">
+                标签
+                <el-tooltip class="item" effect="dark" content="添加标签" placement="right">
+                    <el-button type="primary" icon="plus" style="margin-left: 10px;padding: 7px 9px;" @click="addTag"></el-button>
+                </el-tooltip>
+            </div>
   			<div>
-  				<div class="tag">
+  				<div class="tag" v-for="tag in tags">
   					<i class="fa fa-tags"></i>
-  					打实
-  				</div>
-  				<div class="tag">
-  					<i class="fa fa-tags"></i>
-  					打实大s
-  				</div>
-  				<div class="tag">
-  					<i class="fa fa-tags"></i>
-  					打实
-  				</div>
-  				<div class="tag">
-  					<i class="fa fa-tags"></i>
-  					打实
-  				</div>
-  				<div class="tag">
-  					<i class="fa fa-tags"></i>
-  					打实
-  				</div>
-  				<div class="tag">
-  					<i class="fa fa-tags"></i>
-  					打实
-  				</div>
-  				<div class="tag">
-  					<i class="fa fa-tags"></i>
-  					打实
-  				</div>
-  				<div class="tag">
-  					<i class="fa fa-tags"></i>
-  					打实
+  					{{ tag }}
   				</div>
   			</div>
   		</div>
@@ -75,6 +52,11 @@
 </template>
 <script>
 	export default {
+        data () {
+            return {
+                tags: []
+            }
+        },
 		asyncData () {
 			return {
 			}
@@ -82,7 +64,18 @@
 		methods: {
 			getArticleDetail() {
 				console.log(1);
-			}
+			},
+            addTag (){
+                this.$prompt('请输入标签', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputPattern: /[.]{1,6}/,
+                    inputErrorMessage: '标签长度为1-6个字'
+                }).then(({ value }) => {
+                    this.tags.push(value);
+                }).catch(() => {
+                });
+            }
 		}
 	}
 </script>

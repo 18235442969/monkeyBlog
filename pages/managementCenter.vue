@@ -23,7 +23,6 @@
     		<el-button type="danger">删除</el-button>
 		</div>
 		<div v-html="htmlShow" class="htmlShow">
-			
 		</div>
 	</div>
 </template>
