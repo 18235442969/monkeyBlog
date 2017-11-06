@@ -8,9 +8,9 @@
                 </el-tooltip>
             </div>
   			<div>
-  				<div class="tag" v-for="tag in tags">
+  				<div class="tag" v-for="tag in tags" id="tag._id">
   					<i class="fa fa-tags"></i>
-  					{{ tag }}
+  					{{ tag.value }}
   				</div>
   			</div>
   		</div>
@@ -51,6 +51,7 @@
   	</div>
 </template>
 <script>
+	import api from '../assets/js/api/article.js'
 	export default {
         data () {
             return {
@@ -66,16 +67,35 @@
 				console.log(1);
 			},
             addTag (){
-                this.$prompt('请输入标签', '提示', {
+                this.$prompt('请输入标签', '标签', {
                     confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    inputPattern: /[.]{1,6}/,
-                    inputErrorMessage: '标签长度为1-6个字'
+                    cancelButtonText: '取消'
                 }).then(({ value }) => {
-                    this.tags.push(value);
-                }).catch(() => {
+                	api.addTag({
+                		value: value.trim()
+                	}).then((response) => {
+                		if (response.status == '01') {
+                			this.$message({
+					          	message: '添加成功',
+					          	type: 'success'
+					        });
+                    		this.tags.push(response.data);
+		          		}
+                	})
+                }).catch((error) => {
+                	console.log(error);
                 });
+            },
+            getTags (){
+            	api.getTags().then((response) => {
+            		if (response.status == '01') {
+                		this.tags = response.data;
+	          		}
+            	})
             }
+		},
+		mounted() {
+			this.getTags();
 		}
 	}
 </script>
