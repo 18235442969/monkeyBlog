@@ -8,7 +8,7 @@
                 </el-tooltip>
             </div>
   			<div>
-  				<div class="tag" v-for="tag in tags" id="tag._id">
+  				<div class="tag" v-for="tag in tags" :id="tag._id">
   					<i class="fa fa-tags"></i>
   					{{ tag.value }}
   				</div>
