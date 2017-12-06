@@ -8,10 +8,10 @@
                 </el-tooltip>
             </div>
   			<div>
-  				<div class="tag" v-for="tag in tags" :id="tag._id">
+  				<el-tag class="tag" v-for="tag in tags" :id="tag._id" :key="tag._id" closable type='info' @close="deleteTag(tag)">
   					<i class="fa fa-tags"></i>
-  					{{ tag.value }}
-  				</div>
+				  	{{ tag.value }}
+				</el-tag>
   			</div>
   		</div>
   		<div>
@@ -92,6 +92,42 @@
                 		this.tags = response.data;
 	          		}
             	})
+            },
+            deleteTag: async function (tag) {
+        		this.$confirm('不想要这个标签了?', '提示', {
+		          	confirmButtonText: '不想要了',
+		          	cancelButtonText: '点错了',
+		          	type: 'warning'
+		        }).then(async () => {
+		        	try {
+		        		var resourse = await api.delTag({
+		        			id: tag._id
+		        		});
+		        		console.log(resourse);
+		        		if (resourse.status === '01') {
+        					this.tags = this.tags.filter(e => e._id !== tag._id);
+							this.$message({
+					            type: 'success',
+					            message: '删除成功!'
+				          	});
+		        		} else {
+		        			this.$message({
+				            	type: 'info',
+					            message: '删除失败'
+				          	});
+		        		}
+		        	} catch (e) {
+		        		this.$message({
+				            type: 'info',
+				            message: '删除失败'
+			          	});
+		        	}
+		        }).catch(() => {
+		          	this.$message({
+			            type: 'info',
+			            message: '已取消删除'
+		          	});
+		        });
             }
 		},
 		mounted() {
@@ -113,7 +149,7 @@
 	.tag{
 		display: inline-block;
 		cursor: pointer;
-		margin: 10px;
+		margin: 5px;
 		border-radius: 10%;
 		padding: 1px 3px;
 		background-color: #9e9e9e;
@@ -128,6 +164,14 @@
 	}
 	.tag.actived{
 		background-color: #ef3f3f;
+	}
+	.tagClose{
+		width: 30px;
+		height: 30px;
+		border-radius: 100%;
+		font-size: 10px;
+		background-color: #fff;
+		color: #000000;
 	}
 	.article-list{
 		margin-left: 1%;

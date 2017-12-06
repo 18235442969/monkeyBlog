@@ -9,5 +9,8 @@ export default {
 	},
 	getTags (data) {
 		return service.get('/article/getTags', {params: data});
+	},
+	delTag (data) {
+		return service.post('/article/delTag', data);
 	}
 }

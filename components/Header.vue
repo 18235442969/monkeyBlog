@@ -145,7 +145,7 @@
 		position: absolute;
 		display: inline-block;
 		right: 0px;
-		width: 100px;
+		width: 150px;
 		height: 100%;
 		cursor: pointer;
 	}
