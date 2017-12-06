@@ -66,32 +66,30 @@
 			getArticleDetail() {
 				console.log(1);
 			},
-            addTag (){
+            addTag: async function (){
                 this.$prompt('请输入标签', '标签', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消'
-                }).then(({ value }) => {
-                	api.addTag({
+                }).then(async ({ value }) => {
+                	var response = await api.addTag({
                 		value: value.trim()
-                	}).then((response) => {
-                		if (response.status == '01') {
-                			this.$message({
-					          	message: '添加成功',
-					          	type: 'success'
-					        });
-                    		this.tags.push(response.data);
-		          		}
-                	})
+                	});
+                	if (response.code == 'OK') {
+            			this.$message({
+				          	message: '添加成功',
+				          	type: 'success'
+				        });
+                		this.tags.push(response.data);
+	          		}
                 }).catch((error) => {
                 	console.log(error);
                 });
             },
-            getTags (){
-            	api.getTags().then((response) => {
-            		if (response.status == '01') {
-                		this.tags = response.data;
-	          		}
-            	})
+            getTags: async function (){
+            	var response = await api.getTags();
+            	if (response.code == 'OK') {
+            		this.tags = response.data;
+          		}
             },
             deleteTag: async function (tag) {
         		this.$confirm('不想要这个标签了?', '提示', {
@@ -103,8 +101,7 @@
 		        		var resourse = await api.delTag({
 		        			id: tag._id
 		        		});
-		        		console.log(resourse);
-		        		if (resourse.status === '01') {
+		        		if (resourse.code === 'OK') {
         					this.tags = this.tags.filter(e => e._id !== tag._id);
 							this.$message({
 					            type: 'success',
@@ -113,13 +110,13 @@
 		        		} else {
 		        			this.$message({
 				            	type: 'info',
-					            message: '删除失败'
+					            message: resourse.msg
 				          	});
 		        		}
 		        	} catch (e) {
 		        		this.$message({
 				            type: 'info',
-				            message: '删除失败'
+				            message: resourse.msg
 			          	});
 		        	}
 		        }).catch(() => {

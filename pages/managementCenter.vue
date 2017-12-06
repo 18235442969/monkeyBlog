@@ -104,8 +104,8 @@
 		            headers:{'Content-Type':'multipart/form-data'}
 	          	};  //添加请求头
 	          	api.upload(param, config).then( response => {
-	          		if (response.status == '01') {
-		    			this.value = this.value.replace(name, response.imgName);
+	          		if (response.code == 'OK') {
+		    			this.value = this.value.replace(name, response.data);
 	          		}
 	          	})
 			},

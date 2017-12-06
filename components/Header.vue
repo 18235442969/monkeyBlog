@@ -110,21 +110,20 @@
 		          	}
 		        });
 			},
-			loginIn (){
-				api.loginIn(this.loginData).then((data) => {
-					if (data.status === '01') {
-						this.loginInDialog = false;
-						this.loginData.username = '';
-						this.loginData.password = '';
-						let nowDate = new Date();
-					  	nowDate.setTime(nowDate.getTime() + (10 * 60 * 1000));
-					  	var expires = "expires = " + nowDate.toGMTString();
-					  	document.cookie = 'loginInfo=' + JSON.stringify(data.data) + "; " + expires;
-						this.loginInfo = data.data;
-					} else {
-						this.$message.error(data.msg);
-					}
-				})
+			loginIn: async function (){
+				var data = await api.loginIn(this.loginData);
+				if (data.code === 'OK') {
+					this.loginInDialog = false;
+					this.loginData.username = '';
+					this.loginData.password = '';
+					let nowDate = new Date();
+				  	nowDate.setTime(nowDate.getTime() + (10 * 60 * 1000));
+				  	var expires = "expires = " + nowDate.toGMTString();
+				  	document.cookie = 'loginInfo=' + JSON.stringify(data.data) + "; " + expires;
+					this.loginInfo = data.data;
+				} else {
+					this.$message.error(data.msg);
+				}
 			},
 			goToHme() {
 				this.$router.push('/');
