@@ -1,15 +1,20 @@
 <template>
 	<div>
 		<div class="article-title">
-			<el-input placeholder="请输入标题" v-model="articleDetail.title">
+			<el-input placeholder="请输入标题" v-model="articleDetail.title" :maxlength="30">
 		    	<template slot="prepend">标题</template>
 		  	</el-input>
 		</div>
 		<div class="article-tag">
-			<el-input placeholder="请输入标签" v-model="articleDetail.tag">
+			标签：
+			<el-select v-model="articleDetail.tagId" placeholder="请选择" @change="changeSelect">
+			    <el-option v-for="tag in tags" :key="tag._id" :label="tag.value" :value="tag._id">
+			    </el-option>
+		  	</el-select>
+			<!-- <el-input placeholder="请输入标签" v-model="articleDetail.tag">
 		    	<template slot="prepend">标签</template>
 		    	<el-button slot="append" icon="plus" @click="addTag"></el-button>
-		  	</el-input>
+		  	</el-input> -->
 		</div>
 		<div class="article-tags">
 			<el-tag type="danger" v-for="(tag, index) in articleDetail.tags" :key="index" :closable="true" @close="deleteTag(tag, index)">{{tag}}</el-tag>
@@ -18,17 +23,16 @@
 			<mavon-editor v-model="value" :toolbars="toolbars" @imgAdd="imgAdd"></mavon-editor>
 		</no-ssr>
 		<div class="article-control">
-			<el-button type="success" @click="save">保存</el-button>
-     		<el-button type="warning">发布</el-button>
+			<el-button type="success" @click="save(0)">保存</el-button>
+     		<el-button type="warning" @click="save(1)">发布</el-button>
     		<el-button type="danger">删除</el-button>
-		</div>
-		<div v-html="htmlShow" class="htmlShow">
 		</div>
 	</div>
 </template>
 
 <script>
 	import marked from 'marked'
+    import { mapGetters } from 'vuex'
 	const rendererMD = new marked.Renderer();
 	marked.setOptions({
       	renderer: rendererMD,
@@ -43,7 +47,16 @@
 	import api from '../assets/js/api/article.js'
 	export default {
 		layout: 'managerment',
-		components: {
+		fetch ({ store, redirect }) {
+			//判断是登录
+		    if (!store.state.user.loginInfo) {
+		      	return redirect('/');
+		    }
+	  	},
+		computed: {
+			...mapGetters([
+                'tags'
+            ])
 		},
 		data() {
 			return {
@@ -86,9 +99,13 @@
 				htmlShow: '',
 				articleDetail: {
 					title: '',
-					tag: '',
+					tagId: '',
+					tagName: '',
 					tags: [],
-					content: ''
+					content: '',
+					state: 0,
+					authorId: this.$store.state.user.loginInfo._id,
+					authorName: this.$store.state.user.loginInfo.name
 				}
 			}
 		},
@@ -121,11 +138,32 @@
 					this.$message.error('请输入标签内容再添加');
 				}
 			},
-			save (){
-    			this.htmlShow = marked(this.value).replace(/<img/g, '<img style="width: 100%;"');
+			changeSelect (id){
+				this.articleDetail.tagName = this.tags.find(e => e._id === id).value;
+			},
+			save: async function (state){
+    			this.articleDetail.content = marked(this.value).replace(/<img/g, '<img style="width: 100%;"');
+    			this.articleDetail.state = state || 0;
+				var res = await api.addArticle(this.articleDetail);
+				if(res.code === 'OK'){
+				 	this.$message({
+			          	message: '提交成功',
+			          	type: 'success'
+			        });
+			        this.articleDetail = {
+			        	title: '',
+						tagId: '',
+						tagName: '',
+						tags: [],
+						content: '',
+						state: 0,
+						authorId: this.$store.state.user.loginInfo._id,
+						authorName: this.$store.state.user.loginInfo.name
+			        }
+				} else {
+					this.$message.error('提交失败');
+				}
 			}
-		},
-		computed: {
 		},
 		mounted() {
 		}

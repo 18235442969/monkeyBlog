@@ -38,7 +38,7 @@
 	export default {
 		computed: {
 	        ...mapGetters([
-	            'isSliderShow'
+	            'isSliderShow', 'loginInfo'
 	        ])
 	    },
 	    data() {
@@ -69,7 +69,6 @@
 		        }, 100);
 	    	}
 	    	return {
-	    		loginInfo: false,
 	    		loginInDialog: false,
 	    		loginData: {
 	    			username: '',
@@ -95,8 +94,14 @@
 			},
 			handleCommand(command) {
 				if(command == 'loginOut') {
-					localStorage.removeItem('loginInfo');
-					this.loginInfo = false;
+					this.$confirm('退出?', '提示', {
+			          	confirmButtonText: '麻溜儿的',
+			          	cancelButtonText: '手误',
+			          	type: 'warning'
+			        }).then(() => {
+		        		document.cookie = 'loginInfo="";-1';
+						this.$store.dispatch('saveUserInfo', false);
+			        }).catch(() =>{})
 				} else if (command == 'managementCenter') {
 					this.$router.push('/managementCenter');
 				}
@@ -113,14 +118,17 @@
 			loginIn: async function (){
 				var data = await api.loginIn(this.loginData);
 				if (data.code === 'OK') {
+					//清除登录框信息
 					this.loginInDialog = false;
 					this.loginData.username = '';
 					this.loginData.password = '';
+					//保存到cookie
 					let nowDate = new Date();
 				  	nowDate.setTime(nowDate.getTime() + (10 * 60 * 1000));
 				  	var expires = "expires = " + nowDate.toGMTString();
 				  	document.cookie = 'loginInfo=' + JSON.stringify(data.data) + "; " + expires;
-					this.loginInfo = data.data;
+				  	//保存用户信息
+					this.$store.dispatch('saveUserInfo', data.data);
 				} else {
 					this.$message.error(data.msg);
 				}
@@ -133,7 +141,7 @@
 			let cookieArr = document.cookie.split(';')
 			let loginInfo = cookieArr.find(e => e.indexOf('loginInfo=') > -1);
 			if (loginInfo) {
-				this.loginInfo = JSON.parse(loginInfo.split('=')[1]);
+				this.$store.dispatch('saveUserInfo', JSON.parse(loginInfo.split('=')[1]));
 			}
 		}
 	}

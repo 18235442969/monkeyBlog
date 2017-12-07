@@ -3,7 +3,7 @@
  */
 const user = {
     state: {
-        loginInfo: '', //登录信息
+        loginInfo: false, //登录信息
         isSliderShow: false
     },
     mutations: {
@@ -22,7 +22,7 @@ const user = {
          */
         saveUserInfo({commit}, par) {
             return new Promise( resolve => {
-                // commit('SAVELOGININFO', par);
+                commit('SAVELOGININFO', par);
                 resolve();
             });
         },

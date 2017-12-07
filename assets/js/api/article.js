@@ -12,5 +12,11 @@ export default {
 	},
 	delTag (data) {
 		return service.post('/article/delTag', data);
+	},
+	addArticle (data) {
+		return service.post('/article/addArticle', data);
+	},
+	getArticleList (data) {
+		return service.get('/article/getArticleList', { params: data } );
 	}
 }

@@ -8,13 +8,13 @@
                 </el-tooltip>
             </div>
   			<div>
-  				<el-tag class="tag" v-for="tag in tags" :id="tag._id" :key="tag._id" closable type='info' @close="deleteTag(tag)">
+  				<el-tag :class="tag.class" v-for="tag in tags" :id="tag._id" :key="tag._id" closable type='info' @close="deleteTag($event, tag)" v-on:click.native="filterTag(tag)">
   					<i class="fa fa-tags"></i>
 				  	{{ tag.value }}
 				</el-tag>
   			</div>
   		</div>
-  		<div>
+  		<div v-if="articleList.length > 0">
   			<div class="article-title">
   				文章列表
   				<el-tooltip class="item" effect="dark" content="添加新文章" placement="right">
@@ -22,28 +22,12 @@
 				</el-tooltip>
   			</div>
   			<ul class="article-list">
-  				<li class="article select">
+  				<li class="article select" v-for="article in articleList" :key="article._id">
   					<div class="article-header">
-  						子组合选择器和同层组合选择器
+  						{{article.title}}
   					</div>
   					<div class="article-time">
-  						2017-09-30
-  					</div>
-  				</li>
-  				<li class="article" @click="getArticleDetail">
-  					<div class="article-header">
-  						子组合选择器和同层组合选择器
-  					</div>
-  					<div class="article-time">
-  						2017-09-30
-  					</div>
-  				</li>
-  				<li class="article">
-  					<div class="article-header">
-  						子组合选择器和同层组合选择器
-  					</div>
-  					<div class="article-time">
-  						2017-09-30
+  						{{article.createTime}}
   					</div>
   				</li>
   			</ul>
@@ -52,10 +36,17 @@
 </template>
 <script>
 	import api from '../assets/js/api/article.js'
+    import { mapGetters } from 'vuex'
 	export default {
+		computed: {
+			...mapGetters([
+                'tags'
+            ])
+		},
         data () {
             return {
-                tags: []
+            	articleList: []
+                // tags: []
             }
         },
 		asyncData () {
@@ -79,7 +70,7 @@
 				          	message: '添加成功',
 				          	type: 'success'
 				        });
-                		this.tags.push(response.data);
+						this.$store.dispatch('addTags', response.data)
 	          		}
                 }).catch((error) => {
                 	console.log(error);
@@ -88,10 +79,12 @@
             getTags: async function (){
             	var response = await api.getTags();
             	if (response.code == 'OK') {
-            		this.tags = response.data;
+            		response.data.forEach(e => e.class = 'tag');
+            		this.$store.dispatch('saveTags', response.data);
           		}
             },
-            deleteTag: async function (tag) {
+            deleteTag: async function (e, tag) {
+            	e.stopPropagation();
         		this.$confirm('不想要这个标签了?', '提示', {
 		          	confirmButtonText: '不想要了',
 		          	cancelButtonText: '点错了',
@@ -102,7 +95,8 @@
 		        			id: tag._id
 		        		});
 		        		if (resourse.code === 'OK') {
-        					this.tags = this.tags.filter(e => e._id !== tag._id);
+        					let tags = this.tags.filter(e => e._id !== tag._id);
+		        			this.$store.dispatch('saveTags', tags);
 							this.$message({
 					            type: 'success',
 					            message: '删除成功!'
@@ -125,10 +119,35 @@
 			            message: '已取消删除'
 		          	});
 		        });
+            },
+            filterTag (tag){
+            	//判断当前是否选中
+            	if (tag.class.indexOf('actived') > -1) {
+            		tag.class = tag.class.replace(/ actived/g, '');
+            	} else {
+            		//获取其他选中的标签
+            		let isChooseTag = this.tags.filter(e => e.class.indexOf('actived') > -1);
+            		if (isChooseTag.length > 0) {
+            			isChooseTag[0].class = isChooseTag[0].class.replace(/ actived/g, '');
+            		}
+            		tag.class += ' actived';
+            	}
+            },
+            getArticleList: async function(){
+            	const res = await api.getArticleList({
+					page: 1,
+					tagId: 0
+				});
+            	if (res.code === 'OK') {
+            		this.articleList = res.data;
+            	} else {
+					this.$message.error('获取文章列表失败');
+            	}
             }
 		},
 		mounted() {
 			this.getTags();
+			this.getArticleList();
 		}
 	}
 </script>
