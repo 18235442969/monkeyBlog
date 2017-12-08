@@ -1,7 +1,7 @@
 <template>
   	<div>
   		<div>
-            <div class="article-title">
+            <div class="article-title" @click="getArticleList">
                 标签
                 <el-tooltip class="item" effect="dark" content="添加标签" placement="right">
                     <el-button type="primary" icon="plus" style="margin-left: 10px;padding: 7px 9px;" @click="addTag"></el-button>
@@ -17,17 +17,17 @@
   		<div v-if="articleList.length > 0">
   			<div class="article-title">
   				文章列表
-  				<el-tooltip class="item" effect="dark" content="添加新文章" placement="right">
+  				<el-tooltip class="item" effect="dark" content="添加新文章" placement="right" @click.native="writeArticle">
 					<el-button type="primary" icon="edit" style="margin-left: 10px;padding: 7px 9px;"></el-button>
 				</el-tooltip>
   			</div>
   			<ul class="article-list">
-  				<li class="article select" v-for="article in articleList" :key="article._id">
+  				<li :class="article.class" v-for="article in articleList" :key="article._id" @click="chooseArticle(article)">
   					<div class="article-header">
   						{{article.title}}
   					</div>
   					<div class="article-time">
-  						{{article.createTime}}
+  						{{article.createTime | timeFilter}}
   					</div>
   				</li>
   			</ul>
@@ -40,22 +40,40 @@
 	export default {
 		computed: {
 			...mapGetters([
-                'tags'
+                'tags', 'articleList'
             ])
 		},
         data () {
             return {
-            	articleList: []
-                // tags: []
             }
         },
 		asyncData () {
 			return {
 			}
 		},
+		filters: {
+			timeFilter (time){
+				var d = new Date(time);
+		       	var year = d.getFullYear();
+		       	var month = (d.getMonth() + 1) < 10 ? '0' + (d.getMonth() + 1) : (d.getMonth() + 1);
+		       	var day = d.getDate() < 10 ? '0' + d.getDate() : d.getDate();
+		       	var hour = d.getHours();
+		       	var minutes = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes();
+		       	return  year+ '年' + month + '月' + day + '日 ' + hour + '点' + minutes + '分';
+			}
+		},
 		methods: {
-			getArticleDetail() {
-				console.log(1);
+			chooseArticle(article) {
+				//判断当前是否选中
+            	if (article.class.indexOf('select') === -1) {
+            		//获取其他选中的标签
+            		let isChooseArticle = this.articleList.filter(e => e.class.indexOf('select') > -1);
+            		if (isChooseArticle.length > 0) {
+            			isChooseArticle[0].class = isChooseArticle[0].class.replace(/ select/g, '');
+            		}
+            		article.class += ' select';
+            		this.$store.dispatch('saveArticleDetail', article);
+            	}
 			},
             addTag: async function (){
                 this.$prompt('请输入标签', '标签', {
@@ -124,6 +142,7 @@
             	//判断当前是否选中
             	if (tag.class.indexOf('actived') > -1) {
             		tag.class = tag.class.replace(/ actived/g, '');
+            		this.getArticleList(0, 1);
             	} else {
             		//获取其他选中的标签
             		let isChooseTag = this.tags.filter(e => e.class.indexOf('actived') > -1);
@@ -131,23 +150,36 @@
             			isChooseTag[0].class = isChooseTag[0].class.replace(/ actived/g, '');
             		}
             		tag.class += ' actived';
+            		this.getArticleList(tag._id, 1);
             	}
             },
-            getArticleList: async function(){
+            getArticleList: async function(tagId, page){
             	const res = await api.getArticleList({
-					page: 1,
-					tagId: 0
+					page: page,
+					tagId: tagId
 				});
             	if (res.code === 'OK') {
-            		this.articleList = res.data;
+            		this.count = res.data.count;
+            		res.data.articleList.forEach(e => e.class = 'article');
+            		this.$store.dispatch('saveArticleList', res.data.articleList)
             	} else {
 					this.$message.error('获取文章列表失败');
             	}
+            },
+            writeArticle (){
+            	this.$store.dispatch('saveArticleDetail', {
+            		_id: '',
+					title: '',
+					tagId: '',
+					tagName: '',
+					content: '',
+					state: 0,
+            	});
             }
 		},
 		mounted() {
 			this.getTags();
-			this.getArticleList();
+			this.getArticleList(0, 1);
 		}
 	}
 </script>
@@ -194,15 +226,20 @@
 		margin-top: 10px;
 		width: 98%;
 		border: 1px solid #c7c6c6;
-
 	}
 	.article{
 		padding: 5px 7px;
+		cursor: pointer;
 		&:not(:last-child){
 			border-bottom: 1px solid #c7c6c6;
 		}
 		&.select{
-			border-left: 0.5rem solid #405bde;
+			border-left: 0.5rem solid #d6d5b7;
+			padding: 10px 0;
+		}
+		&:hover{
+			border-left: 0.5rem solid #d6d5b7;
+			padding: 10px 0;
 		}
 	}
 	.article-header{

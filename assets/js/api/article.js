@@ -18,5 +18,8 @@ export default {
 	},
 	getArticleList (data) {
 		return service.get('/article/getArticleList', { params: data } );
+	},
+	delArticle (data) {
+		return service.get('/article/delArticle', { params: data } );
 	}
 }

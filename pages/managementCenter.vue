@@ -8,6 +8,8 @@
 		<div class="article-tag">
 			标签：
 			<el-select v-model="articleDetail.tagId" placeholder="请选择" @change="changeSelect">
+				<el-option label="请选择" value="">
+			    </el-option>
 			    <el-option v-for="tag in tags" :key="tag._id" :label="tag.value" :value="tag._id">
 			    </el-option>
 		  	</el-select>
@@ -23,16 +25,18 @@
 			<mavon-editor v-model="value" :toolbars="toolbars" @imgAdd="imgAdd"></mavon-editor>
 		</no-ssr>
 		<div class="article-control">
-			<el-button type="success" @click="save(0)">保存</el-button>
-     		<el-button type="warning" @click="save(1)">发布</el-button>
-    		<el-button type="danger">删除</el-button>
+			<el-button type="success" @click="save(0)" v-if="articleDetail.state == 0">保存</el-button>
+			<el-button type="success" @click="save(1)" v-if="articleDetail.state == 1">保存</el-button>
+     		<el-button type="warning" @click="save(1)" v-if="articleDetail.state == 0">发布</el-button>
+    		<el-button type="danger" @click="delArticle">删除</el-button>
 		</div>
 	</div>
 </template>
 
 <script>
-	import marked from 'marked'
     import { mapGetters } from 'vuex'
+	import api from '../assets/js/api/article.js'
+	import marked from 'marked'
 	const rendererMD = new marked.Renderer();
 	marked.setOptions({
       	renderer: rendererMD,
@@ -44,19 +48,21 @@
       	smartLists: true,
       	smartypants: false
     });
-	import api from '../assets/js/api/article.js'
 	export default {
 		layout: 'managerment',
 		fetch ({ store, redirect }) {
-			//判断是登录
-		    if (!store.state.user.loginInfo) {
-		      	return redirect('/');
-		    }
+			// //判断是登录
+		 //    if (!store.state.user.loginInfo) {
+		 //      	return redirect('/');
+		 //    }
 	  	},
 		computed: {
 			...mapGetters([
                 'tags'
-            ])
+            ]),
+            getArticleDetail(){
+            	return this.$store.state.article.articleDetail;
+            }
 		},
 		data() {
 			return {
@@ -98,6 +104,7 @@
 				},
 				htmlShow: '',
 				articleDetail: {
+					id: '',
 					title: '',
 					tagId: '',
 					tagName: '',
@@ -139,33 +146,95 @@
 				}
 			},
 			changeSelect (id){
-				this.articleDetail.tagName = this.tags.find(e => e._id === id).value;
+				if (id != '') {
+					this.articleDetail.tagName = this.tags.find(e => e._id === id).value;
+				}
 			},
 			save: async function (state){
-    			this.articleDetail.content = marked(this.value).replace(/<img/g, '<img style="width: 100%;"');
+				if (this.articleDetail.title == '') {
+					return this.$notify.error({
+			          	title: '提示',
+			          	message: '请输入标题'
+			        });
+				}
+				if (state === 1) {
+					return this.$confirm('发布?', '提示', {
+			          	confirmButtonText: 'yes',
+			          	cancelButtonText: 'no',
+			          	type: 'warning'
+			        }).then(async () => {
+			        	this.publish(state);
+			        }).catch(() => {})
+				}
+				this.publish(state);
+			},
+			publish: async function (state){
+    			this.articleDetail.content = this.value;
     			this.articleDetail.state = state || 0;
 				var res = await api.addArticle(this.articleDetail);
 				if(res.code === 'OK'){
+					res.data.class = 'article';
+			        this.$store.dispatch('addArticle', res.data);
 				 	this.$message({
 			          	message: '提交成功',
 			          	type: 'success'
 			        });
-			        this.articleDetail = {
-			        	title: '',
-						tagId: '',
-						tagName: '',
-						tags: [],
-						content: '',
-						state: 0,
-						authorId: this.$store.state.user.loginInfo._id,
-						authorName: this.$store.state.user.loginInfo.name
-			        }
-				} else {
+			        this.value = '';
+			        this.articleDetail.id = '';
+			        this.articleDetail.title = '';
+			        this.articleDetail.tagId = '';
+			        this.articleDetail.tagName = '';
+			        this.articleDetail.content = '';
+			        this.articleDetail.state = 0;
+	     	  	} else {
 					this.$message.error('提交失败');
 				}
+			},
+			delArticle: async function(){
+				if (this.articleDetail.id == '') {
+					return;
+				}
+				this.$confirm('不想要这个文章了?', '提示', {
+		          	confirmButtonText: '太恶心了',
+		          	cancelButtonText: '点错了',
+		          	type: 'warning'
+		        }).then(async () => {
+		        	var res = await api.delArticle({
+						id: this.articleDetail.id
+					}).catch(err => console.log(err));
+					if (res.code === 'OK') {
+						this.$store.dispatch('delArticle', this.articleDetail.id)
+						this.$message({
+				          	message: '删除成功',
+				          	type: 'success'
+				        });
+				        this.value = '';
+				        this.articleDetail.id = '';
+				        this.articleDetail.title = '';
+				        this.articleDetail.tagId = '';
+				        this.articleDetail.tagName = '';
+				        this.articleDetail.content = '';
+				        this.articleDetail.state = 0;
+					} else {
+						this.$message({
+				          	message: res.msg,
+				          	type: 'error'
+				        });
+					}
+		        }).catch(() => {})
 			}
 		},
 		mounted() {
+		},
+		watch: {
+			getArticleDetail (val){
+				this.articleDetail.id = val._id;
+				this.articleDetail.title = val.title;
+				this.articleDetail.tagId = val.tagId;
+				this.articleDetail.tagName = val.tagName;
+				this.articleDetail.state = val.state;
+				this.value = val.content;
+			}
 		}
 	}
 </script>
