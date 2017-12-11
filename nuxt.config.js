@@ -29,7 +29,7 @@ module.exports = {
         src: '~static/css/font-awesome.min.css',
         lang: 'css'
     },{
-        src: 'mavon-editor/dist/css/index.css',
+        src: '~static/css/mavonEditor.css',
         lang: 'css'
     }],
     /*

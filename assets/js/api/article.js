@@ -16,6 +16,9 @@ export default {
 	addArticle (data) {
 		return service.post('/article/addArticle', data);
 	},
+	editArticle (data) {
+		return service.post('/article/editArticle', data);
+	},
 	getArticleList (data) {
 		return service.get('/article/getArticleList', { params: data } );
 	},

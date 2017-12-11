@@ -50,6 +50,10 @@
 </script>
 
 <style lang="scss" scoped>
+	*{
+		margin: auto;
+		padding: auto;
+	}
 	.blog-detail-title{
 		text-align: center;
 		margin-top: 5px;

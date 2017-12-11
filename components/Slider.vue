@@ -47,5 +47,6 @@
 		padding: 0 20px;
 		font-size: .7rem;
 		color: #808080;
+		text-align: center;
 	}
 </style>

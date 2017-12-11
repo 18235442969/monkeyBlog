@@ -35,6 +35,10 @@ const article = {
             })
             state.articleList.unshift(par);
         },
+        EDITARTICLE: (state, par) => {
+            var index = state.articleList.findIndex(e => e._id === par._id);
+            state.articleList.splice(index, 1, par);
+        },
         DELARTICLE: (state, par) => {
             state.articleList = state.articleList.filter(e => e._id != par);
         }
@@ -70,6 +74,12 @@ const article = {
          */
         addArticle({ commit }, par) {
             commit('ADDARTICLE', par);
+        },
+        /**
+         * [editArticle 修改文章]
+         */
+        editArticle({ commit }, par) {
+            commit('EDITARTICLE', par);
         },
         /**
          * [delArticle 删除文章]

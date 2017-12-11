@@ -155,6 +155,7 @@
 		width: 150px;
 		height: 100%;
 		cursor: pointer;
+		line-height: 60px;
 	}
 	.blog{
 		cursor: pointer;

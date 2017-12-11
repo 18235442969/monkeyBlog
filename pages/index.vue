@@ -67,12 +67,12 @@
                 }
             },
             contentFilter (value){
-                return marked(value).replace(/<img/g, '<img style="max-width: 100%;"').slice(0, 300) + '...';
+                return marked(value).slice(0, 150) + '...'.replace(/<img/g, '<img style="max-width: 100%;"');
             }
         },
         mounted() {
             window.scrollTo(0, this.scrollY);
-            this.getArticleList(0, 1);
+            this.getArticleList(0, 1, 1);
         },
         filters: {
             timeFilter (time){

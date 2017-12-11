@@ -33,6 +33,7 @@
     }
     .header{
         height: 7.5%;
+        line-height: 60px;
         text-align: -webkit-auto;
     }
     @media (max-width: 800px) {

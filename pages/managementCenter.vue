@@ -26,7 +26,7 @@
 		</no-ssr>
 		<div class="article-control">
 			<el-button type="success" @click="save(0)" v-if="articleDetail.state == 0">保存</el-button>
-			<el-button type="success" @click="save(1)" v-if="articleDetail.state == 1">保存</el-button>
+			<el-button type="success" @click="save(2)" v-if="articleDetail.state == 1">保存</el-button>
      		<el-button type="warning" @click="save(1)" v-if="articleDetail.state == 0">发布</el-button>
     		<el-button type="danger" @click="delArticle">删除</el-button>
 		</div>
@@ -36,25 +36,13 @@
 <script>
     import { mapGetters } from 'vuex'
 	import api from '../assets/js/api/article.js'
-	import marked from 'marked'
-	const rendererMD = new marked.Renderer();
-	marked.setOptions({
-      	renderer: rendererMD,
-      	gfm: true,
-      	tables: true,
-      	breaks: false,
-      	pedantic: false,
-      	sanitize: false,
-      	smartLists: true,
-      	smartypants: false
-    });
 	export default {
 		layout: 'managerment',
 		fetch ({ store, redirect }) {
-			// //判断是登录
-		 //    if (!store.state.user.loginInfo) {
-		 //      	return redirect('/');
-		 //    }
+			//判断是登录
+		    if (!store.state.user.loginInfo) {
+		      	return redirect('/');
+		    }
 	  	},
 		computed: {
 			...mapGetters([
@@ -85,7 +73,7 @@
 			      	table: true, // 表格
 			      	fullscreen: true, // 全屏编辑
 			      	readmodel: true, // 沉浸式阅读
-			      	htmlcode: false, // 展示html源码
+			      	htmlcode: true, // 展示html源码
 			      	help: true, // 帮助
 			      	/* 1.3.5 */
 			      	undo: true, // 上一步
@@ -165,27 +153,40 @@
 			        }).then(async () => {
 			        	this.publish(state);
 			        }).catch(() => {})
+				} else if (state === 2) {
+					return this.publish(1);
+				} else {
+					this.publish(state);
 				}
-				this.publish(state);
 			},
 			publish: async function (state){
     			this.articleDetail.content = this.value;
     			this.articleDetail.state = state || 0;
-				var res = await api.addArticle(this.articleDetail);
+    			let res;
+    			if (!!this.articleDetail.id) {
+    				res = await api.editArticle(this.articleDetail);
+    			} else {
+					res = await api.addArticle(this.articleDetail);
+    			}
 				if(res.code === 'OK'){
 					res.data.class = 'article';
-			        this.$store.dispatch('addArticle', res.data);
+					if (!this.articleDetail.id) {
+			        	this.$store.dispatch('addArticle', res.data);
+					} else {
+			        	this.$store.dispatch('editArticle', res.data);
+					}
+					this.$store.dispatch('saveArticleDetail', {
+	            		_id: '',
+						title: '',
+						tagId: '',
+						tagName: '',
+						content: '',
+						state: 0,
+	            	});
 				 	this.$message({
 			          	message: '提交成功',
 			          	type: 'success'
 			        });
-			        this.value = '';
-			        this.articleDetail.id = '';
-			        this.articleDetail.title = '';
-			        this.articleDetail.tagId = '';
-			        this.articleDetail.tagName = '';
-			        this.articleDetail.content = '';
-			        this.articleDetail.state = 0;
 	     	  	} else {
 					this.$message.error('提交失败');
 				}
@@ -208,13 +209,14 @@
 				          	message: '删除成功',
 				          	type: 'success'
 				        });
-				        this.value = '';
-				        this.articleDetail.id = '';
-				        this.articleDetail.title = '';
-				        this.articleDetail.tagId = '';
-				        this.articleDetail.tagName = '';
-				        this.articleDetail.content = '';
-				        this.articleDetail.state = 0;
+				        this.$store.dispatch('saveArticleDetail', {
+		            		_id: '',
+							title: '',
+							tagId: '',
+							tagName: '',
+							content: '',
+							state: 0,
+		            	});
 					} else {
 						this.$message({
 				          	message: res.msg,
