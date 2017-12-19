@@ -35,7 +35,7 @@
 
 <script>
     import { mapGetters } from 'vuex'
-	import api from '../assets/js/api/article.js'
+	import { article } from '../assets/js/api/index'
 	export default {
 		layout: 'managerment',
 		fetch ({ store, redirect }) {
@@ -115,7 +115,7 @@
 	          	let config = {
 		            headers:{'Content-Type':'multipart/form-data'}
 	          	};  //添加请求头
-	          	api.upload(param, config).then( response => {
+	          	article.upload(param, config).then( response => {
 	          		if (response.code == 'OK') {
 		    			this.value = this.value.replace(name, response.data);
 	          		}
@@ -164,9 +164,9 @@
     			this.articleDetail.state = state || 0;
     			let res;
     			if (!!this.articleDetail.id) {
-    				res = await api.editArticle(this.articleDetail);
+    				res = await article.editArticle(this.articleDetail);
     			} else {
-					res = await api.addArticle(this.articleDetail);
+					res = await article.addArticle(this.articleDetail);
     			}
 				if(res.code === 'OK'){
 					res.data.class = 'article';
@@ -200,7 +200,7 @@
 		          	cancelButtonText: '点错了',
 		          	type: 'warning'
 		        }).then(async () => {
-		        	var res = await api.delArticle({
+		        	var res = await article.delArticle({
 						id: this.articleDetail.id
 					}).catch(err => console.log(err));
 					if (res.code === 'OK') {

@@ -16,7 +16,7 @@
 
 <script>
     import { mapGetters } from 'vuex'
-    import api from '../assets/js/api/article.js'
+    import { article } from '../assets/js/api/index'
     import marked from 'marked'
     const rendererMD = new marked.Renderer();
     marked.setOptions({
@@ -53,7 +53,7 @@
         },
         methods: {
             getArticleList: async function(tagId, page, state){
-                const res = await api.getArticleList({
+                const res = await article.getArticleList({
                     page: page,
                     tagId: tagId,
                     state: state

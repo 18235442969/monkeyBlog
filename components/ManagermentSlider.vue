@@ -1,7 +1,7 @@
 <template>
   	<div>
   		<div>
-            <div class="article-title" @click="getArticleList">
+            <div class="article-title">
                 标签
                 <el-tooltip class="item" effect="dark" content="添加标签" placement="right">
                     <el-button type="primary" icon="plus" style="margin-left: 10px;padding: 7px 9px;" @click="addTag"></el-button>
@@ -35,7 +35,7 @@
   	</div>
 </template>
 <script>
-	import api from '../assets/js/api/article.js'
+	import { article } from '../assets/js/api/index'
     import { mapGetters } from 'vuex'
 	export default {
 		computed: {
@@ -80,7 +80,7 @@
                     confirmButtonText: '确定',
                     cancelButtonText: '取消'
                 }).then(async ({ value }) => {
-                	var response = await api.addTag({
+                	var response = await article.addTag({
                 		value: value.trim()
                 	});
                 	if (response.code == 'OK') {
@@ -95,7 +95,7 @@
                 });
             },
             getTags: async function (){
-            	var response = await api.getTags();
+            	var response = await article.getTags();
             	if (response.code == 'OK') {
             		response.data.forEach(e => e.class = 'tag');
             		this.$store.dispatch('saveTags', response.data);
@@ -109,7 +109,7 @@
 		          	type: 'warning'
 		        }).then(async () => {
 		        	try {
-		        		var resourse = await api.delTag({
+		        		var resourse = await article.delTag({
 		        			id: tag._id
 		        		});
 		        		if (resourse.code === 'OK') {
@@ -154,7 +154,7 @@
             	}
             },
             getArticleList: async function(tagId, page){
-            	const res = await api.getArticleList({
+            	const res = await article.getArticleList({
 					page: page,
 					tagId: tagId
 				});

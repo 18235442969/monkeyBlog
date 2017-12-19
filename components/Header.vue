@@ -34,7 +34,7 @@
 </template>
 <script>
 	import { mapGetters } from 'vuex'
-	import api from '../assets/js/api/loginApi.js'
+	import { loginApi } from '../assets/js/api/index'
 	export default {
 		computed: {
 	        ...mapGetters([
@@ -116,7 +116,7 @@
 		        });
 			},
 			loginIn: async function (){
-				var data = await api.loginIn(this.loginData);
+				var data = await loginApi.loginIn(this.loginData);
 				if (data.code === 'OK') {
 					//清除登录框信息
 					this.loginInDialog = false;
