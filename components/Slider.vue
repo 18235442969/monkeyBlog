@@ -1,6 +1,23 @@
 <template>
-    <transition name="custom-classes-transition" enter-active-class="animated fadeInLeft">
-		<div v-show="show">
+	<div>
+	    <transition name="custom-classes-transition" enter-active-class="animated fadeInLeft">
+			<div v-show="show" class="media-show">
+				<div class="persion-div">
+					<img src="/image/persionImage.JPG" alt="persionImage" class="persionImage" />
+				</div>
+				<div class="quotes">
+					{{ sliderQuotes[parseInt(Math.random()*sliderQuotes.length)] }}
+				</div>
+				<div class="tags">
+					<el-row>
+					  	<el-col :span="10" :offset="1" v-for="tag in tags" :key="tag._id">
+							<el-tag type="info">{{tag.value}}({{tag.articleCount}})</el-tag>
+					  	</el-col>
+					</el-row>
+				</div>
+			</div>
+	    </transition>
+		<div class="media-hide">
 			<div class="persion-div">
 				<img src="/image/persionImage.JPG" alt="persionImage" class="persionImage" />
 			</div>
@@ -15,7 +32,7 @@
 				</el-row>
 			</div>
 		</div>
-    </transition>
+	</div>
 </template>
 
 <script>
@@ -55,6 +72,17 @@
 
 
 <style lang="scss">
+	.media-show{
+		display: none;
+	}
+	@media (max-width: 800px) {
+		.media-hide{
+			display: none;
+		}
+		.media-show{
+			display: block;
+		}
+	}
 	.persion-div{
 		text-align: center;
 	}
