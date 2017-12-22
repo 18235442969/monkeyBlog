@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="article-content">
 		<div v-html="contentFilter(articleDetail.content)" :body-style="blogListBodyStyle">
 		</div>
 	</div>
@@ -7,6 +7,7 @@
 
 <script>
     import { mapGetters } from 'vuex'
+    import { article } from '../../../assets/js/api/index'
     import marked from 'marked'
     const rendererMD = new marked.Renderer();
     marked.setOptions({
@@ -36,8 +37,13 @@
 			}
 		},
 		methods: {
-			getArticleDetail (id){
-				this.articleDetail = this.articleList.find(e => e._id === id);
+			getArticleDetail: async function(id){
+				const req = await article.getArticleDetail({
+					id: id
+				});
+				if (req.code === 'OK') {
+					this.articleDetail = req.data;
+				}
 			},
 			contentFilter (value){
                 return marked(value).replace(/<img/g, '<img style="max-width: 100%;"');
@@ -66,5 +72,10 @@
 	}
 	.blog-detail-content{
 		padding: 7px;
+	}
+	@media (max-width: 800px) {
+		.content{
+			width: 96%;
+		}
 	}
 </style>

@@ -37,7 +37,8 @@ $top: 61px;
 .container{
     position: relative;
     top: $top;
-    max-width: 1000px;
+    z-index: 1;
+    max-width: 80%;
     margin: 0 auto;
     &:after {
         content: "";
@@ -77,10 +78,16 @@ $top: 61px;
  * [移动端适配]
  */
 @media (max-width: 800px) {
+    .canvas-nest{
+        display: none;
+    }
     .header{
         h1{
             font-size: 1.5rem;
         }
+    }
+    .container{
+        max-width: 100%;
     }
     .sliderShowDiv{
         display: inline-block;

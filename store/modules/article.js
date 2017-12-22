@@ -5,7 +5,8 @@ const article = {
     state: {
         tags: [],
         articleDetail: {},
-        articleList: []
+        articleList: [],
+        page: 1
     },
     mutations: {
         SAVETAGS: (state, par) => {
@@ -41,6 +42,9 @@ const article = {
         },
         DELARTICLE: (state, par) => {
             state.articleList = state.articleList.filter(e => e._id != par);
+        },
+        CHANGEPAGE: (state, par) => {
+            state.page = par;
         }
     },
     actions: {
@@ -86,6 +90,12 @@ const article = {
          */
         delArticle({ commit }, par) {
             commit('DELARTICLE', par);
+        },
+        /**
+         * [changePage 改变页码]
+         */
+        changePage({ commit }, par) {
+            commit('CHANGEPAGE', par);
         }
     }
 };

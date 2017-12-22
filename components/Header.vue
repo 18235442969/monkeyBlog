@@ -3,7 +3,9 @@
   		<div class="sliderShowDiv" @click="sliderChange">
 			<i class="fa fa-bars"></i>
   		</div>
-		<h1 class="blog" @click="goToHme">HZY'Blog</h1>
+    	<transition name="custom-classes-transition" enter-active-class="animated bounceInUp">
+			<h1 class="blog" @click="goToHme" v-show="show">HZY'Blog</h1>
+		</transition>
 		<div class="loginBtn">
 			<el-button type="text" v-if="!loginInfo" @click="loginInDialog = true">登录</el-button>
 			<el-dropdown @command="handleCommand" trigger="click" v-else>
@@ -69,6 +71,7 @@
 		        }, 100);
 	    	}
 	    	return {
+	    		show: false,
 	    		loginInDialog: false,
 	    		loginData: {
 	    			username: '',
@@ -124,7 +127,7 @@
 					this.loginData.password = '';
 					//保存到cookie
 					let nowDate = new Date();
-				  	nowDate.setTime(nowDate.getTime() + (10 * 60 * 1000));
+				  	nowDate.setTime(nowDate.getTime() + (24 * 60 * 60 * 1000));
 				  	var expires = "expires = " + nowDate.toGMTString();
 				  	document.cookie = 'loginInfo=' + JSON.stringify(data.data) + "; " + expires;
 				  	//保存用户信息
@@ -138,6 +141,7 @@
 			}
 		},
 		mounted() {
+			this.show = true;
 			let cookieArr = document.cookie.split(';')
 			let loginInfo = cookieArr.find(e => e.indexOf('loginInfo=') > -1);
 			if (loginInfo) {

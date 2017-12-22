@@ -10,7 +10,7 @@
   			<div>
   				<el-tag :class="tag.class" v-for="tag in tags" :id="tag._id" :key="tag._id" closable type='info' @close="deleteTag($event, tag)" v-on:click.native="filterTag(tag)">
   					<i class="fa fa-tags"></i>
-				  	{{ tag.value }}
+				  	{{ tag.value }} (<span class="article-count">{{tag.articleCount}}</span>)
 				</el-tag>
   			</div>
   		</div>
@@ -256,5 +256,9 @@
 		color: #4c4c4c;
 		font-size: .8rem;
 		text-align: right;
+	}
+	.article-count{
+		font-weight: 600;
+		color: #795548;
 	}
 </style>

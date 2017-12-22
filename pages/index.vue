@@ -1,23 +1,27 @@
 <template>
-    <div>
-        <div class="blogList">
-            <el-card class="box-card" :body-style="blogListBodyStyle" v-for="article in articleList" :key="article._id">
-                <h3>{{article.title}}</h3>
-                <div class="blogListTime">{{article.createTime | timeFilter}}</div>
-                <div class="blogListContent" v-html='contentFilter(article.content)'>
+        <div>
+            <div class="blogList">
+                <div class="box-card" :body-style="blogListBodyStyle" v-for="article in articleList" :key="article._id">
+                    <h3>{{article.title}}</h3>
+                    <div class="blogListTime">{{article.createTime | timeFilter}}</div>
+                    <div class="blogListContent" v-html='contentFilter(article.content)'>
+                    </div>
+                    <div class="blogListFooter">
+                        <nuxt-link :to="article._id | urlFilter">阅读原文</nuxt-link>
+                    </div>
                 </div>
-                <div class="blogListFooter">
-                    <nuxt-link :to="article._id | urlFilter">阅读原文</nuxt-link>
-                </div>
-            </el-card>
+            </div>
+            <div class="block">
+                <el-pagination layout="prev, pager, next" :total="count" @current-change="changePage" :page-size="pageSize" :current-page="page"></el-pagination>
+            </div>
         </div>
-    </div>
 </template>
 
 <script>
     import { mapGetters } from 'vuex'
     import { article } from '../assets/js/api/index'
     import marked from 'marked'
+    import canvasNest from '../static/js/canvas-nest.js'
     const rendererMD = new marked.Renderer();
     marked.setOptions({
         renderer: rendererMD,
@@ -41,14 +45,16 @@
         },
         computed: {
             ...mapGetters([
-                'scrollY', 'articleList'
+                'scrollY', 'articleList', 'page'
             ])
         },
         data() {
             return {
                 blogListBodyStyle: {
                     padding: '10px'
-                }
+                },
+                count: 0,
+                pageSize: 10
             }
         },
         methods: {
@@ -68,11 +74,16 @@
             },
             contentFilter (value){
                 return marked(value).slice(0, 150) + '...'.replace(/<img/g, '<img style="max-width: 100%;"');
+            },
+            changePage(page) {
+                this.$store.dispatch('changePage', page);
+                this.getArticleList(0, page, 1);
             }
         },
         mounted() {
             window.scrollTo(0, this.scrollY);
-            this.getArticleList(0, 1, 1);
+            canvasNest('canvasNest', '0', 0.7, '103,184,247', 100)
+            this.getArticleList(0, this.page, 1);
         },
         filters: {
             timeFilter (time){
@@ -92,7 +103,6 @@
         }
     }
 </script>
-
 <style lang="scss" scoped>
     .blogList{
         padding: 5px 5px 30px 5px;
@@ -101,6 +111,8 @@
             > {
                 padding: 5px;
             }
+            padding-bottom: 10px;
+            border-bottom: 1px solid #bfbcbc;
             .blogListTime{
                 margin: 5px 0;
                 color: gray;
@@ -111,5 +123,8 @@
                 font-size: .9rem;
             }
         }
+    }
+    .block{
+        text-align: right;
     }
 </style>
