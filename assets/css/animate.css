@@ -9,7 +9,7 @@
  * Copyright (c) 2016 Daniel Eden
  */
 
-@media (min-width: 801px) {
+/*@media (min-width: 801px) {*/
     .animated {
         -webkit-animation-duration: .5s;
         animation-duration: .5s;
@@ -3141,4 +3141,4 @@
         -webkit-animation-name: slideOutUp;
         animation-name: slideOutUp;
     }
-}
+/*}*/

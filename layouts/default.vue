@@ -5,9 +5,11 @@
             <slider class="slider" :class="[$store.state.user.isSliderShow ? 'sliderShow' : '']"></slider>
             <div class="shadow" @click="closeSlider(false)" :style="{display: $store.state.user.isSliderShow ? 'block' : 'none'}"></div>
             <transition name="custom-classes-transition" enter-active-class="animated fadeInRight" leave-active-class="animated fadeOutLeft">
-                <nuxt class="content" v-show="show"></nuxt>
+                <nuxt class="content media-show" v-show="show"></nuxt>
             </transition>
-
+            <transition name="custom-classes-transition" enter-active-class="animated fadeIn">
+                <nuxt class="content media-hide" v-show="show"></nuxt>
+            </transition>
         </div>
     </div>
 </template>
@@ -40,4 +42,18 @@ export default {
 <style lang="scss">
     @import '../assets/css/frame.scss';
     @import '../assets/css/animate.css';
+    .media-show{
+        display: block;
+    }
+    .media-hide{
+        display: none;
+    }
+    @media (max-width: 800px) {
+        .media-hide{
+            display: block;
+        }
+        .media-show{
+            display: none;
+        }
+    }
 </style>

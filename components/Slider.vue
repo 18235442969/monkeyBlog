@@ -73,14 +73,17 @@
 
 <style lang="scss">
 	.media-show{
+		display: block;
+	}
+	.media-hide{
 		display: none;
 	}
 	@media (max-width: 800px) {
 		.media-hide{
-			display: none;
+			display: block;
 		}
 		.media-show{
-			display: block;
+			display: none;
 		}
 	}
 	.persion-div{

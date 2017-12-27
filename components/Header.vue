@@ -4,8 +4,9 @@
 			<i class="fa fa-bars"></i>
   		</div>
     	<transition name="custom-classes-transition" enter-active-class="animated bounceInUp">
-			<h1 class="blog" @click="goToHme" v-show="show">HZY'Blog</h1>
+			<h1 v-show="show" class="blog media-show" @click="goToHme">HZY'Blog</h1>
 		</transition>
+		<h1 v-show="show" class="blog media-hide" @click="goToHme">HZY'Blog</h1>
 		<div class="loginBtn">
 			<el-button type="text" v-if="!loginInfo" @click="loginInDialog = true">登录</el-button>
 			<el-dropdown @command="handleCommand" trigger="click" v-else>
@@ -164,9 +165,21 @@
 	.blog{
 		cursor: pointer;
 	}
+	.media-show{
+	    display: inline-block;
+	}
+	.media-hide{
+	    display: none;
+	}
 	@media (max-width: 800px) {
 		.loginBtn{
 			display: none;
 		}
+		.media-hide{
+	        display: block;
+	    }
+	    .media-show{
+	        display: none;
+	    }
 	}
 </style>

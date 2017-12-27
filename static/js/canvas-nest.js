@@ -5,6 +5,9 @@
  * GitHub: https://github.com/hustcc/canvas-nest.js
  **/
 function canvasNest(id, zIndex, opacity, color, count) {
+    if(document.getElementsByClassName('canvas-nest').length > 0){
+        return;
+    }
     //获取配置参数
     function get_config_option() {
         return {
